@@ -7,6 +7,22 @@ Series`. It depends on two further packages
 [medical-ts-datasets](https://github.com/ExpectationMax/medical_ts_datasets)
 (containing the implementation of the datasets used).
 
+## Citing our work
+```bibtex
+@InProceedings{pmlr-v119-horn20a,
+  title = {Set Functions for Time Series},
+  author = {Horn, Max and Moor, Michael and Bock, Christian and Rieck, Bastian and Borgwardt, Karsten},
+  booktitle = {Proceedings of the 37th International Conference on Machine Learning},
+  pages = {4353--4363},
+  year = {2020},
+  editor = {Hal Daumé III and Aarti Singh},
+  volume = {119},
+  series = {Proceedings of Machine Learning Research},
+  month = {13--18 Jul},
+  publisher = {PMLR},
+}
+```
+
 ## Installation
 
 The project requires python version `3.7` (newer versions of python are unfortunately
