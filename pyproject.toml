@@ -11,6 +11,7 @@ tensorflow = { version = "=1.15.3", markers = "sys_platform != 'linux'" }
 tensorflow-gpu = { version = "=1.15.3", markers = "sys_platform == 'linux'" }
 medical-ts-datasets = { git = "https://github.com/ExpectationMax/medical_ts_datasets.git", branch = "master" }
 keras-transformer = { git = "https://github.com/ExpectationMax/keras-transformer.git", branch = "master" }
+tensorflow-datasets = ">=2.0.0,<4.0.0"
 scikit-learn = "^0.22.1"
 tqdm = "^4.42.0"
 
