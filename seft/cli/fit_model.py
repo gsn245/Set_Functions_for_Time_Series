@@ -127,12 +127,12 @@ def main():
     print(commandline)
     set_seed_random_number_generators(args.random_seed)
     task = DATASET_TO_TASK_MAPPING[args.dataset]
-    model = getattr(seft.models, args.model).from_hyperparameter_dict(
-        task, hyperparameter_dict)
 
     base_log_dir = log_dir
 
     for i in range(args.num_splits):
+        model = getattr(seft.models, args.model).from_hyperparameter_dict(
+        task, hyperparameter_dict)
 
         # Save the state
         if base_log_dir is not None:
