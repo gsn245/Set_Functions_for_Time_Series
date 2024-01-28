@@ -25,7 +25,7 @@ from .logging_utils import NumpyEncoder
 
 class TrainingLoop(Callable):
     def __init__(self, model, dataset, task, epochs, hparams, early_stopping,
-                 rundir, balance_dataset=True, additional_callbacks=None,
+                 rundir, split, balance_dataset=True, additional_callbacks=None,
                  debug=False):
         self.model = model
         self.dataset = dataset
@@ -37,6 +37,7 @@ class TrainingLoop(Callable):
         self.rundir = rundir
         self.balance_dataset = balance_dataset
         self.debug = debug
+        self.split = split
 
         self.callbacks = self._build_callbacks(additional_callbacks)
 
@@ -52,7 +53,8 @@ class TrainingLoop(Callable):
         val_iterator_cb, _ = build_validation_iterator(
             self.dataset,
             self.hparams['batch_size'],
-            self._normalize_and_preprocess()
+            self._normalize_and_preprocess(),
+            split=self.split
         )
         val_cb = EvaluationCallback(
             val_iterator_cb,
@@ -168,14 +170,16 @@ class TrainingLoop(Callable):
             self.hparams['batch_size'],
             self._normalize_and_preprocess(with_weights=True),
             balance=self.balance_dataset,
-            class_balance=class_balance
+            class_balance=class_balance,
+            split=self.split,
         )
         # Repeat epochs + 1 times as we run an additional validation step at
         # the end of training afer recovering the model.
         val_iterator, val_steps = build_validation_iterator(
             self.dataset,
             self.hparams['batch_size'],
-            self._normalize_and_preprocess()
+            self._normalize_and_preprocess(),
+            split=self.split
         )
         return train_iterator, train_steps, val_iterator, val_steps
 
@@ -224,7 +228,8 @@ class TrainingLoop(Callable):
         test_iterator, _ = build_test_iterator(
             self.dataset,
             self.hparams['batch_size'],
-            self._normalize_and_preprocess()
+            self._normalize_and_preprocess(),
+            split=self.split
         )
         test_cb = EvaluationCallback(
             test_iterator,

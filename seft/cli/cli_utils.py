@@ -110,6 +110,7 @@ def parse_commandline_arguments():
     )
     parser.add_argument('--balance', default=False, action='store_true')
     parser.add_argument('--hypersearch', default=False, action='store_true')
+    parser.add_argument('--num_splits', default=1, type=int)
     subparsers = parser.add_subparsers(dest='model')
     subparsers.required = True
 

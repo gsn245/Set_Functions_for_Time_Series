@@ -220,20 +220,23 @@ def main():
         required=True, nargs='+', type=str, choices=['validation', 'testing'],
     )
     parser.add_argument('--output', required=False, type=str, default=None)
+    parser.add_argument('--num-splits', required=False, type=int, default=1)
 
     args = parser.parse_args()
 
     model = load_model(
         args.dataset, args.model, args.model_config, args.model_weights)
     output = {}
-    for split in args.splits:
-        out = evaluate_model(args.dataset, model, split)
-        out = {
-            f'{split}_{metric_name}': metric_value
-            for metric_name, metric_value in out.items()
-        }
-        output.update(out)
-    print(output)
-    if args.output is not None:
-        with open(args.output, 'w') as f:
-            json.dump(output, f)
+    for i in range(args.num_splits):
+        split_output = args.output + f'_{i}' if args.output is not None else None
+        for split in args.splits:
+            out = evaluate_model(args.dataset, model, split)
+            out = {
+                f'{split}_{metric_name}': metric_value
+                for metric_name, metric_value in out.items()
+            }
+            output.update(out)
+        print(output)
+        if args.output is not None:
+            with open(split_output, 'w') as f:
+                json.dump(output, f)

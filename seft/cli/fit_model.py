@@ -122,11 +122,6 @@ def main():
     hyperparameter_dict, args = get_hyperparameter_settings(
         hyperparameters, args)
 
-    # Save the state
-    if log_dir is not None:
-        args.hypersearch = False
-        save_args_to_json(args, os.path.join(log_dir, 'config.json'))
-
     print('Recreate run using following command:')
     commandline = get_reproducable_commandline(args, hyperparameter_dict)
     print(commandline)
@@ -135,18 +130,32 @@ def main():
     model = getattr(seft.models, args.model).from_hyperparameter_dict(
         task, hyperparameter_dict)
 
-    train_loop = TrainingLoop(
-        model,
-        args.dataset,
-        task,
-        args.max_epochs,
-        hyperparameter_dict,
-        args.early_stopping,
-        log_dir,
-        balance_dataset=args.balance,
-        debug=args.debug
-    )
-    train_loop()
+    base_log_dir = log_dir
+
+    for i in range(args.num_splits):
+
+        # Save the state
+        if base_log_dir is not None:
+
+            args.hypersearch = False
+            save_args_to_json(args, os.path.join(base_log_dir, 'config.json'))
+
+            log_dir = os.path.join(base_log_dir, str(i))
+            os.makedirs(log_dir, exist_ok=False)
+
+        train_loop = TrainingLoop(
+            model,
+            args.dataset,
+            task,
+            args.max_epochs,
+            hyperparameter_dict,
+            args.early_stopping,
+            log_dir,
+            balance_dataset=args.balance,
+            debug=args.debug,
+            split=i+1
+        )
+        train_loop()
 
 
 if __name__ == '__main__':

@@ -4,6 +4,7 @@ import random
 
 from collections.abc import Sequence
 
+import numpy as np
 import tensorflow as tf
 import tensorflow_datasets as tfds
 import medical_ts_datasets
@@ -117,15 +118,25 @@ def negative_instances(*args):
     return tf.math.equal(tf.reduce_max(label), 0)
 
 
-def build_training_iterator(dataset_name, epochs, batch_size, prepro_fn,
+def build_training_iterator(dataset_name, epochs, batch_size, prepro_fn, split,
                             balance=False, class_balance=None):
     dataset, dataset_info = tfds.load(
         dataset_name,
-        split=tfds.Split.TRAIN,
+        split="train",
         as_supervised=True,
-        with_info=True
+        with_info=True,
+        builder_kwargs={'split': split},
+        data_dir="./datasets/"
     )
     n_samples = dataset_info.splits['train'].num_examples
+
+    # Class balance needs recomputing
+    np_dataset = tfds.as_numpy(dataset)
+    dataset_labels = [label for _, label in np_dataset]
+    counts_per_label = np.unique(dataset_labels, return_counts=True)
+    class_balance = counts_per_label[1] / n_samples
+    class_balance = {i: class_balance[i] for i in range(len(class_balance))}
+
     steps_per_epoch = int(math.floor(n_samples / batch_size))
     if prepro_fn is not None:
         dataset = dataset.map(prepro_fn, num_parallel_calls=AUTOTUNE)
@@ -176,7 +187,7 @@ def build_training_iterator(dataset_name, epochs, batch_size, prepro_fn,
     return batched_dataset.prefetch(AUTOTUNE), steps_per_epoch
 
 
-def build_validation_iterator(dataset_name, batch_size, prepro_fn):
+def build_validation_iterator(dataset_name, batch_size, prepro_fn, split):
     """Build a validation iterator for a tensorflow datasets dataset.
 
     Args:
@@ -196,7 +207,9 @@ def build_validation_iterator(dataset_name, batch_size, prepro_fn):
         dataset_name,
         split=tfds.Split.VALIDATION,
         as_supervised=True,
-        with_info=True
+        with_info=True,
+        builder_kwargs={'split_id': split},
+        data_dir="./datasets/"
     )
     n_samples = dataset_info.splits['validation'].num_examples
     steps_per_epoch = int(math.ceil(n_samples / batch_size))
@@ -213,12 +226,14 @@ def build_validation_iterator(dataset_name, batch_size, prepro_fn):
     return batched_dataset, steps_per_epoch
 
 
-def build_test_iterator(dataset_name, batch_size, prepro_fn):
+def build_test_iterator(dataset_name, batch_size, prepro_fn, split):
     dataset, dataset_info = tfds.load(
         dataset_name,
         split=tfds.Split.TEST,
         as_supervised=True,
-        with_info=True
+        with_info=True,
+        builder_kwargs={'split_id': split},
+        data_dir="./datasets/"
     )
     n_samples = dataset_info.splits['test'].num_examples
     steps = int(math.floor(n_samples / batch_size))
