@@ -4,7 +4,7 @@ import json
 import os
 import sys
 
-import medical_ts_datasets
+from seft.medical_ts_datasets_radv import medical_ts_datasets
 import seft.models
 
 from .hyperparameters import training_hyperparameters, UndefinedHyperparameter
@@ -110,7 +110,7 @@ def parse_commandline_arguments():
     )
     parser.add_argument('--balance', default=False, action='store_true')
     parser.add_argument('--hypersearch', default=False, action='store_true')
-    parser.add_argument('--num_splits', default=1, type=int)
+    parser.add_argument('--num_splits', default=5, type=int)
     subparsers = parser.add_subparsers(dest='model')
     subparsers.required = True
 

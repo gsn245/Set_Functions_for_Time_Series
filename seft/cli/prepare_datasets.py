@@ -1,7 +1,7 @@
 """Prepare all datasets."""
 import argparse
 
-import medical_ts_datasets
+from seft.medical_ts_datasets_radv import medical_ts_datasets
 from seft.normalization import Normalizer
 
 def main():

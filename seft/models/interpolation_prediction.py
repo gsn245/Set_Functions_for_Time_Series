@@ -39,6 +39,8 @@ class single_channel_interp(tf.keras.layers.Layer):
             ref_t = tf.expand_dims(
                 tf.expand_dims(interpolation_grid, 1), 1)
             output_dim = tf.shape(interpolation_grid)[-1]
+            #print(f"ref points = {interpolation_grid.shape}" )
+            #quit()
         d = K.tile(d[:, :, :, None], (1, 1, 1, output_dim))
         mask = K.tile(m[:, :, :, None], (1, 1, 1, output_dim))
         x_t = K.tile(x_t[:, :, :, None], (1, 1, 1, output_dim))
@@ -217,6 +219,8 @@ class InterpolationPredictionModel(tf.keras.Model):
             X = tf.tile(X, [1, Y.get_shape()[-1]])
             # Further the layers expect (bs, feature, tp inputs), so we need to
             # transpose
+
+            #print(f"grid = {grid.shape}")
             return (
                 (
                     demo,

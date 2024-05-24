@@ -9,6 +9,8 @@ import numpy as np
 from tqdm import tqdm
 
 import tensorflow_datasets as tfds
+from seft.medical_ts_datasets_radv import medical_ts_datasets
+
 
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'resources')
 
@@ -16,7 +18,7 @@ CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'resources')
 class Normalizer:
     """Normalizer for medical time series datasets."""
 
-    def __init__(self, dataset_name):
+    def __init__(self, dataset_name, split):
         """Initialize normalizer
 
         Args:
@@ -24,6 +26,8 @@ class Normalizer:
             datasets.
 
         """
+        self.split = split
+
         self.dataset = dataset_name
         self._means = None
         self._stds = None
@@ -43,7 +47,8 @@ class Normalizer:
             self.dataset,
             split=tfds.Split.TRAIN,
             as_supervised=True,
-            with_info=True
+            with_info=True,
+            builder_kwargs={'split': self.split}
         )
         config_file = os.path.join(
             CONFIG_PATH, f'normalization_{info.name}_v{info.version}.json')

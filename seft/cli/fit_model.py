@@ -117,20 +117,24 @@ def main():
             os.makedirs(log_dir, exist_ok=False)
         logger.debug(f'Saving results to {log_dir}')
 
-    hyperparameters = handle_special_cases(
-        args, hyperparameters)
-    hyperparameter_dict, args = get_hyperparameter_settings(
-        hyperparameters, args)
-
     print('Recreate run using following command:')
-    commandline = get_reproducable_commandline(args, hyperparameter_dict)
-    print(commandline)
+    #commandline = get_reproducable_commandline(args, hyperparameter_dict)
+    #print(commandline)
     set_seed_random_number_generators(args.random_seed)
     task = DATASET_TO_TASK_MAPPING[args.dataset]
 
     base_log_dir = log_dir
 
     for i in range(args.num_splits):
+        #if i in [0, 1, 2]:
+        #    print("BOOP"),
+        #  continue
+        hyperparameters = handle_special_cases(
+        args, hyperparameters)
+
+        hyperparameter_dict, args = get_hyperparameter_settings(
+        hyperparameters, args)
+
         model = getattr(seft.models, args.model).from_hyperparameter_dict(
         task, hyperparameter_dict)
 

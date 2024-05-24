@@ -30,7 +30,7 @@ class TrainingLoop(Callable):
         self.model = model
         self.dataset = dataset
         self.task = task
-        self.normalizer = Normalizer(dataset)
+        self.normalizer = Normalizer(dataset, split)
         self.n_epochs = epochs
         self.early_stopping = early_stopping
         self.hparams = hparams
@@ -315,7 +315,7 @@ class TrainingLoop(Callable):
             metrics=['accuracy'],
             # TODO: Continue here
             sample_weight_mode=(
-                None if self.task.class_weights is None else "temporal")
+                None if self.task.class_weights is None else "temporal"),
         )
         history = self.model.fit(
             train_iter,
@@ -327,7 +327,7 @@ class TrainingLoop(Callable):
             # also pass validation_steps.
             validation_data=val_iter,
             validation_steps=val_steps,
-            verbose=1
+            verbose=1,
         )
 
         # Eval and summary

@@ -217,9 +217,10 @@ class Regression(Task):
 
 DATASET_TO_TASK_MAPPING = {
     'physionet2012': BinaryClassification(),
-    'physionet2019': OnlineBinaryClassification(
-        class_weights={0: 0.5553, 1: 5.0188}
-    ),
+    # 'physionet2019': OnlineBinaryClassification(
+    #     class_weights={0: 0.5553, 1: 5.0188}
+    # ),
+    'physionet2019': BinaryClassification(),
     'mimic3_mortality': BinaryClassification(),
     'mimic3_phenotyping': MultilabelClassification(25)
 }
