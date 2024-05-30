@@ -9,7 +9,8 @@ import numpy as np
 from tqdm import tqdm
 
 import tensorflow_datasets as tfds
-from seft.medical_ts_datasets_radv import medical_ts_datasets
+#from seft.medical_ts_datasets_radv import medical_ts_datasets
+import medical_ts_datasets
 
 
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'resources')

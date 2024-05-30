@@ -4,7 +4,7 @@ This is the main source code for the submission `Set Functions for Time
 Series`. It depends on two further packages
 [keras-transformer](https://github.com/ExpectationMax/keras-transformer)
 (fork with support for sequences of different lengths) and
-[medical-ts-datasets](https://github.com/ExpectationMax/medical_ts_datasets)
+[medical-ts-datasets](https://github.com/gsn245/medical_ts_datasets, forked from https://github.com/ExpectationMax/medical_ts_datasets)
 (containing the implementation of the datasets used).
 
 ## Citing our work
@@ -117,7 +117,7 @@ a compressed file. We are planning to make this file available in the MIMIC-III
 preprocessed data repository.
 
 ### Adding new datasets
-The datasets used in this code are implemented in a separate package [medical_ts_dataset](https://github.com/ExpectationMax/medical_ts_datasets).
+The datasets used in this code are implemented in a separate package [medical_ts_dataset](https://github.com/gsn245/medical_ts_datasets, forked from https://github.com/ExpectationMax/medical_ts_datasets).
 In total you would need to run the following steps:
 
  1. Implement dataset in a fork of `medical_ts_datasets` or create you own

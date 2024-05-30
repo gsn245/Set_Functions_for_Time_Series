@@ -6,7 +6,8 @@ import seft.cli.silence_warnings
 import tensorflow as tf
 from tensorflow.data.experimental import Reducer
 import tensorflow_datasets as tfds
-from seft.medical_ts_datasets_radv import medical_ts_datasets
+#from seft.medical_ts_datasets_radv import medical_ts_datasets
+import medical_ts_datasets
 import numpy as np
 from tqdm import tqdm
 

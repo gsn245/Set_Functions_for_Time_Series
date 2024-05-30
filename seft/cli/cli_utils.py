@@ -4,7 +4,8 @@ import json
 import os
 import sys
 
-from seft.medical_ts_datasets_radv import medical_ts_datasets
+# from seft.medical_ts_datasets_radv import medical_ts_datasets
+import medical_ts_datasets
 import seft.models
 
 from .hyperparameters import training_hyperparameters, UndefinedHyperparameter

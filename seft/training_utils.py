@@ -15,7 +15,8 @@ from .normalization import Normalizer
 import tqdm
 import os
 
-from seft.medical_ts_datasets_radv import medical_ts_datasets
+#from seft.medical_ts_datasets_radv import medical_ts_datasets
+import medical_ts_datasets
 
 get_output_shapes = tf.compat.v1.data.get_output_shapes
 get_output_types = tf.compat.v1.data.get_output_types
