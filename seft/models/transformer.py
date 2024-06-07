@@ -103,6 +103,11 @@ class TransformerModel(tf.keras.Model):
 
     def call(self, inputs):
         demo, times, values, measurements, lengths = inputs
+        # tf.print(tf.shape(demo))
+        # tf.print(tf.shape(times))
+        # tf.print(tf.shape(values))
+        # tf.print(tf.shape(measurements))
+        # tf.print(tf.shape(lengths))
         transformed_times = self.positional_encoding(times)
         value_modality_embedding = tf.concat(
             (
@@ -116,8 +121,8 @@ class TransformerModel(tf.keras.Model):
         # In graph mode legths has an additional dimension
         if len(lengths.get_shape()) == 2:
             lengths = tf.squeeze(lengths, -1)
-        mask = tf.sequence_mask(lengths+1, name='mask')
-
+        # mask = tf.sequence_mask(lengths+1, name='mask')        
+        mask = tf.sequence_mask(lengths+1, name='mask', maxlen=207) # HAR onlys
         demo_embedded = self.demo_embedding(demo)
         embedded = self.element_embedding(value_modality_embedding)
         combined = self.add([transformed_times, embedded])
@@ -155,7 +160,7 @@ class TransformerModel(tf.keras.Model):
         return [
             HParamWithDefault(
                 'n_dims',
-                hp.Discrete([64, 128, 256, 512, 1024]),
+                hp.Discrete([8, 64, 128, 256, 512, 1024]),
                 default=128
             ),
             HParamWithDefault(

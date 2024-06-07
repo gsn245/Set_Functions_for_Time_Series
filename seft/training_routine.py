@@ -27,19 +27,21 @@ class TrainingLoop(Callable):
     def __init__(self, model, dataset, task, epochs, hparams, early_stopping,
                  rundir, split, balance_dataset=True, additional_callbacks=None,
                  debug=False):
+        self.har = True # TODO: this must be made general
         self.model = model
         self.dataset = dataset
         self.task = task
-        self.normalizer = Normalizer(dataset, split)
+        self.normalizer = Normalizer(dataset, split) if not self.har else None
         self.n_epochs = epochs
         self.early_stopping = early_stopping
         self.hparams = hparams
         self.rundir = rundir
-        self.balance_dataset = balance_dataset
+        self.balance_dataset = balance_dataset if not self.har else False
         self.debug = debug
         self.split = split
 
         self.callbacks = self._build_callbacks(additional_callbacks)
+
 
     def _build_callbacks(self, additional_callbacks):
         callbacks = []
@@ -134,6 +136,10 @@ class TrainingLoop(Callable):
 
     def _normalize_and_preprocess(self, with_weights=False):
         """Normalize input data and apply model specific preprocessing fn."""
+
+        if self.har:
+            return None
+
         if self.model.data_preprocessing_fn() is None:
             return self.normalizer.get_normalization_fn()
 
@@ -164,6 +170,8 @@ class TrainingLoop(Callable):
                 self.normalizer._class_balance[str(i)] for i in range(2)]
         else:
             class_balance = None
+        
+
         train_iterator, train_steps = build_training_iterator(
             self.dataset,
             self.n_epochs,
