@@ -209,26 +209,12 @@ def normalize_and_serialize_all_splits_and_datasets(dataset_name="physionet2012"
 
             np.save(f"./{set_id}_{dataset_name}_{i}.npy", arr=pdict, allow_pickle=True)
 
-def har_data_generator(split_type, split):
+def har_data_generator(dataset_name, split_type, split):
 
     # FOR HAR IMPLEMENTATION 
-    data = np.load("../Patient_Journey_Classification/HARdata/split_" + str(split) + "/" + split_type + "_" + "HAR" + "_" + str(split) + ".npy", allow_pickle=True) #array of dicts
+    data = np.load("../Patient_Journey_Classification/" + str(dataset_name) + "/split_" + str(split) + "/" + split_type + "_" + "HAR" + "_" + str(split) + ".npy", allow_pickle=True) #array of dicts
 
-    # print(static.shape)
-    # print(times.shape)
-    # print(values.shape)
-    # print(mask.shape)
-    # print(length.shape)
-
-    #examples = []
-    #labels = []
     n_samples = len(data)
-
-    # all_statics = []
-    # all_times = []
-    # all_values = []
-    # all_sensor_masks = []
-    # all_lengths = []
 
     def gen():
         for ex in data: 
@@ -239,26 +225,17 @@ def har_data_generator(split_type, split):
             mask = ex["ts_indicators"]
             length = mask.sum(-1) # true if >0 else false
             length = (length > 0).sum() # np.array([(length > 0).sum()])
-            # all_statics.append(static)
-            # all_times.append(times)
-            # all_values.append(values)
-            # all_sensor_masks.append(mask)
-            # all_lengths.append(length)
-            # example_tuple = (static, times, values, mask, length)  #(static, times, values, tf.cast(mask, tf.float32), tf.cast(length, tf.float32)) 
-            # examples.append(example_tuple)
-            # create labels (list of labels)
-            #labels.append(np.int32(ex["labels"])) #labels.append(tf.cast(int(ex["labels"]), tf.int8)) 
             label = ex["labels"] #labels.append(tf.cast(int(ex["labels"]), tf.int8))
             new_label = np.zeros(6)
             new_label[int(label)] = 1
-            example = (static, np.expand_dims(times, axis=-1), values, mask, length)
+            example = (static, times, values, mask, length)
 
             yield (example, new_label)
 
     dataset = tf.data.Dataset.from_generator(
      gen, 
      ((tf.float32, tf.float32, tf.float32, tf.bool, tf.int32), tf.int64),
-     ((TensorShape([Dimension(1)]), TensorShape([Dimension(None), Dimension(1)]), TensorShape([Dimension(None), Dimension(3)]), TensorShape([Dimension(None), Dimension(3)]), TensorShape([])), TensorShape(Dimension(6)))
+     ((TensorShape([Dimension(1)]), TensorShape([Dimension(None)]), TensorShape([Dimension(None), Dimension(3)]), TensorShape([Dimension(None), Dimension(3)]), TensorShape([])), TensorShape(Dimension(6)))
     )
 
     return dataset, n_samples
@@ -266,51 +243,28 @@ def har_data_generator(split_type, split):
 def build_training_iterator(dataset_name, epochs, batch_size, prepro_fn, split,
                             balance=False, class_balance=None):
 
-    #normalize_and_serialize_all_splits_and_datasets(dataset_name)
-    #quit()
+    if "HAR" in dataset_name:
+        # FOR HAR IMPLEMENTATION 
+        dataset, n_samples = har_data_generator(dataset_name, split_type="train", split=split)
+
+    else: 
+        normalize_and_serialize_all_splits_and_datasets(dataset_name)
     
-    """
-    # Comment out this block if using own dataset 
-    
-    dataset, dataset_info = tfds.load(
-        dataset_name,
-        split="train",
-        as_supervised=True,
-        with_info=True,
-        builder_kwargs={'split': split},
-        data_dir="./datasets/"
-    )
-    
-    print("output_types, output_shapes")
-    print(tf.compat.v1.data.get_output_types(dataset))
-    print(tf.compat.v1.data.get_output_shapes(dataset))
-    
-    quit()
+        dataset, dataset_info = tfds.load(
+            dataset_name,
+            split="train",
+            as_supervised=True,
+            with_info=True,
+            builder_kwargs={'split': split},
+            data_dir="./datasets/"
+        )
+        
+        print("output_types, output_shapes")
+        print(tf.compat.v1.data.get_output_types(dataset))
+        print(tf.compat.v1.data.get_output_shapes(dataset))
 
-    """
-    # dataset_np = tfds.as_numpy(dataset)
-    # for ex in dataset_np:
-    #     print(ex)
-    #     quit()
+        n_samples = dataset_info.splits['train'].num_examples
 
-
-    # FOR HAR IMPLEMENTATION 
-    dataset, n_samples = har_data_generator(split_type="train", split=split)
-
-    #examples = (all_statics, all_times, all_values, all_sensor_masks, all_lengths)
-    #dataset = tf.data.Dataset.from_tensor_slices((examples, labels))
-    # if that doesn't work, try from generator function?
-
-    # Conver to tensorflow dataset
-
-    # Generate dataset and dataset_info on your own
-    # By np loading dataset and converting to tf.data.Dataset()
-
-    #train_dataset = tf.data.Dataset.from_tensor_slices((train_examples, train_labels))
-    #test_dataset = tf.data.Dataset.from_tensor_slices((test_examples, test_labels)) 
-    #dataset, dataset_ifo = 
-
-    #n_samples = dataset_info.splits['train'].num_examples
 
     steps_per_epoch = int(math.floor(n_samples / batch_size))
     if prepro_fn is not None: #make sure it's none for my dataset
@@ -378,19 +332,25 @@ def build_validation_iterator(dataset_name, batch_size, prepro_fn, split):
            epoch times.
 
     """
-    # dataset, dataset_info = tfds.load(
-    #     dataset_name,
-    #     split=tfds.Split.VALIDATION,
-    #     as_supervised=True,
-    #     with_info=True,
-    #     builder_kwargs={'split': split},
-    #     data_dir="./datasets/"
-    # )
-    # n_samples = dataset_info.splits['validation'].num_examples
-    # steps_per_epoch = int(math.ceil(n_samples / batch_size))
-    # if prepro_fn is not None:
-    #     dataset = dataset.map(prepro_fn, num_parallel_calls=AUTOTUNE)
-    dataset, n_samples = har_data_generator(split_type="validation", split=split)
+
+    if "HAR" in dataset_name:
+        dataset, n_samples = har_data_generator(dataset_name, split_type="validation", split=split)
+    
+    else:
+        dataset, dataset_info = tfds.load(
+            dataset_name,
+            split=tfds.Split.VALIDATION,
+            as_supervised=True,
+            with_info=True,
+            builder_kwargs={'split': split},
+            data_dir="./datasets/"
+        )
+        n_samples = dataset_info.splits['validation'].num_examples
+    
+    steps_per_epoch = int(math.ceil(n_samples / batch_size))
+
+    if prepro_fn is not None:
+        dataset = dataset.map(prepro_fn, num_parallel_calls=AUTOTUNE)
 
     # Batch
     batched_dataset = dataset.padded_batch(
@@ -404,19 +364,25 @@ def build_validation_iterator(dataset_name, batch_size, prepro_fn, split):
 
 
 def build_test_iterator(dataset_name, batch_size, prepro_fn, split):
-    # dataset, dataset_info = tfds.load(
-    #     dataset_name,
-    #     split=tfds.Split.TEST,
-    #     as_supervised=True,
-    #     with_info=True,
-    #     builder_kwargs={'split': split},
-    #     data_dir="./datasets/"
-    # )
-    # n_samples = dataset_info.splits['test'].num_examples
-    # if prepro_fn is not None:
-    #     dataset = dataset.map(prepro_fn, num_parallel_calls=AUTOTUNE)
 
-    dataset, n_samples = har_data_generator(split_type="test", split=split)
+    if "HAR" in dataset_name:
+        dataset, n_samples = har_data_generator(dataset_name, split_type="test", split=split)
+
+    else:
+        dataset, dataset_info = tfds.load(
+            dataset_name,
+            split=tfds.Split.TEST,
+            as_supervised=True,
+            with_info=True,
+            builder_kwargs={'split': split},
+            data_dir="./datasets/"
+        )
+        n_samples = dataset_info.splits['test'].num_examples
+
+    if prepro_fn is not None:
+        dataset = dataset.map(prepro_fn, num_parallel_calls=AUTOTUNE)
+
+    
     steps = int(math.floor(n_samples / batch_size))
 
     # Batch

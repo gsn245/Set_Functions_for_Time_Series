@@ -220,8 +220,14 @@ DATASET_TO_TASK_MAPPING = {
     # 'physionet2019': OnlineBinaryClassification(
     #     class_weights={0: 0.5553, 1: 5.0188}
     # ),
-    # 'physionet2019': BinaryClassification(), # TODO: Uncomment
-    'physionet2019': MultilabelClassification(6),
+    'physionet2019': BinaryClassification(),
     'mimic3_mortality': BinaryClassification(),
-    'mimic3_phenotyping': MultilabelClassification(25)
+    'mimic3_phenotyping': MultilabelClassification(25),
+    'HARdata': MultilabelClassification(6),
+    'HARdata_.25': MultilabelClassification(6),
+    'HARdata_.5': MultilabelClassification(6),
+    'HARdata_.75': MultilabelClassification(6),
+    'HARdata_.9': MultilabelClassification(6),
+    'HARdata_.95': MultilabelClassification(6),
+    'HARdata_.99': MultilabelClassification(6)
 }

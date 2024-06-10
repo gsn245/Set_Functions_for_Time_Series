@@ -107,7 +107,9 @@ def parse_commandline_arguments():
     parser.add_argument(
         '--dataset',
         required=False,
-        choices=medical_ts_datasets.builders
+        choices=medical_ts_datasets.builders + ["HARdata", "HARdata_.25", "HARdata_.5", 
+                                                "HARdata_.75", "HARdata_.9", "HARdata_.95", 
+                                                "HARdata_.99"] # modified
     )
     parser.add_argument('--balance', default=False, action='store_true')
     parser.add_argument('--hypersearch', default=False, action='store_true')

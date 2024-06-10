@@ -27,9 +27,9 @@ class TrainingLoop(Callable):
     def __init__(self, model, dataset, task, epochs, hparams, early_stopping,
                  rundir, split, balance_dataset=True, additional_callbacks=None,
                  debug=False):
-        self.har = True # TODO: this must be made general
         self.model = model
         self.dataset = dataset
+        self.har = True if "HAR" in self.dataset else False
         self.task = task
         self.normalizer = Normalizer(dataset, split) if not self.har else None
         self.n_epochs = epochs
@@ -138,7 +138,10 @@ class TrainingLoop(Callable):
         """Normalize input data and apply model specific preprocessing fn."""
 
         if self.har:
-            return None
+            if self.model.data_preprocessing_fn() is None:
+                return None
+            else:
+                return self.model.data_preprocessing_fn()
 
         if self.model.data_preprocessing_fn() is None:
             return self.normalizer.get_normalization_fn()
